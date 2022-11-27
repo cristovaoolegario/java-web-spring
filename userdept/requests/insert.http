@@ -1,0 +1,10 @@
+POST http://localhost:8080/users HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Zezinho",
+    "email": "ze@gmail.com",
+    "department": {
+      "id": 2
+    }
+  }
