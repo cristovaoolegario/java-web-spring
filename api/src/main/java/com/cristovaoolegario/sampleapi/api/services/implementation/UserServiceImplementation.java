@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.cristovaoolegario.sampleapi.api.domain.User;
 import com.cristovaoolegario.sampleapi.api.repositories.UserRepository;
 import com.cristovaoolegario.sampleapi.api.services.UserService;
+import com.cristovaoolegario.sampleapi.api.services.exceptions.ObjectNotFoundException;
 
 @Service
 public class UserServiceImplementation implements UserService {
@@ -18,7 +19,7 @@ public class UserServiceImplementation implements UserService {
   @Override
   public User findById(Integer id) {
     Optional<User> obj = repository.findById(id);
-    return obj.orElse(null);
+    return obj.orElseThrow(() -> new ObjectNotFoundException("Object not found"));
   }
 
 }
