@@ -1,5 +1,8 @@
 package com.cristovaoolegario.sampleapi.api.controller;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,14 @@ public class UserController {
   @GetMapping(value = "/{id}")
   public ResponseEntity<UserDTO> findById(@PathVariable Integer id) {
     return ResponseEntity.ok().body(mapper.map(service.findById(id), UserDTO.class));
+  }
+
+  @GetMapping
+  public ResponseEntity<List<UserDTO>> findAll() {
+    List<UserDTO> dtoList = service.findAll().stream().map(item -> mapper.map(item, UserDTO.class))
+        .collect(Collectors.toList());
+    return ResponseEntity.ok().body(dtoList);
+
   }
 
 }
