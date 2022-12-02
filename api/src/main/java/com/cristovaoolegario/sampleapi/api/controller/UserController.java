@@ -55,7 +55,5 @@ public class UserController {
     obj.setId(id);
     User newUser = service.update(obj);
     return ResponseEntity.ok().body(mapper.map(newUser, UserDTO.class));
-
   }
-
 }
