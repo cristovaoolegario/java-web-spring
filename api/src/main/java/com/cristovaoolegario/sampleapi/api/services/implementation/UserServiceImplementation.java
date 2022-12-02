@@ -11,6 +11,7 @@ import com.cristovaoolegario.sampleapi.api.domain.User;
 import com.cristovaoolegario.sampleapi.api.domain.dto.UserDTO;
 import com.cristovaoolegario.sampleapi.api.repositories.UserRepository;
 import com.cristovaoolegario.sampleapi.api.services.UserService;
+import com.cristovaoolegario.sampleapi.api.services.exceptions.DataIntegrityViolationException;
 import com.cristovaoolegario.sampleapi.api.services.exceptions.ObjectNotFoundException;
 
 @Service
@@ -35,7 +36,15 @@ public class UserServiceImplementation implements UserService {
 
   @Override
   public User create(UserDTO user) {
+    findByEmail(user);
     return repository.save(mapper.map(user, User.class));
+  }
+
+  private void findByEmail(UserDTO userDto) {
+    Optional<User> user = repository.findByEmail(userDto.getEmail());
+    if (user.isPresent()) {
+      throw new DataIntegrityViolationException("Email already registered!");
+    }
   }
 
 }
