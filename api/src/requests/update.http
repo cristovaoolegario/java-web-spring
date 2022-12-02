@@ -1,0 +1,8 @@
+PUT http://localhost:8080/users/1 HTTP/1.1
+content-type: application/json
+
+{
+  "name":"Test update",
+  "email":"test@gmail.com",
+  "password":"123"
+}
