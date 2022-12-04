@@ -1,5 +1,7 @@
 package com.cristovaoolegario.sampleapi.api.services.implementation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -15,10 +17,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.cristovaoolegario.sampleapi.api.domain.User;
 import com.cristovaoolegario.sampleapi.api.domain.dto.UserDTO;
 import com.cristovaoolegario.sampleapi.api.repositories.UserRepository;
+import com.cristovaoolegario.sampleapi.api.services.exceptions.ObjectNotFoundException;
 
 @SpringBootTest
 public class UserServiceImplementationTest {
 
+  private static final String OBJECT_NOT_FOUND = "Object not found";
   private static final Integer ID = 1;
   private static final String NAME = "test user";
   private static final String EMAIL = "test@gmail.com";
@@ -60,5 +64,16 @@ public class UserServiceImplementationTest {
     Assertions.assertEquals(NAME, response.getName());
     Assertions.assertEquals(EMAIL, response.getEmail());
 
+  }
+
+  @Test
+  void GivenAInvalidIdWhenFindByIdThenReturnAnObjectNotFoundException() {
+    Mockito.when(repository.findById(Mockito.anyInt())).thenThrow(new ObjectNotFoundException(OBJECT_NOT_FOUND));
+    try {
+      service.findById(ID);
+    } catch (Exception ex) {
+      assertEquals(ObjectNotFoundException.class, ex.getClass());
+      assertEquals(OBJECT_NOT_FOUND, ex.getMessage());
+    }
   }
 }
