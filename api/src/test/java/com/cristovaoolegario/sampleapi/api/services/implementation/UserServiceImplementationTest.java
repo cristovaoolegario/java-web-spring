@@ -1,7 +1,9 @@
 package com.cristovaoolegario.sampleapi.api.services.implementation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -22,11 +24,12 @@ import com.cristovaoolegario.sampleapi.api.services.exceptions.ObjectNotFoundExc
 @SpringBootTest
 public class UserServiceImplementationTest {
 
-  private static final String OBJECT_NOT_FOUND = "Object not found";
   private static final Integer ID = 1;
   private static final String NAME = "test user";
   private static final String EMAIL = "test@gmail.com";
   private static final String PASSWORD = "123password";
+  private static final String OBJECT_NOT_FOUND = "Object not found";
+  private static final int INDEX = 0;
 
   @InjectMocks
   private UserServiceImplementation service;
@@ -58,12 +61,11 @@ public class UserServiceImplementationTest {
 
     User response = service.findById(ID);
 
-    Assertions.assertNotNull(response);
-    Assertions.assertEquals(User.class, response.getClass());
-    Assertions.assertEquals(ID, response.getId());
-    Assertions.assertEquals(NAME, response.getName());
-    Assertions.assertEquals(EMAIL, response.getEmail());
-
+    assertNotNull(response);
+    assertEquals(User.class, response.getClass());
+    assertEquals(ID, response.getId());
+    assertEquals(NAME, response.getName());
+    assertEquals(EMAIL, response.getEmail());
   }
 
   @Test
@@ -75,5 +77,20 @@ public class UserServiceImplementationTest {
       assertEquals(ObjectNotFoundException.class, ex.getClass());
       assertEquals(OBJECT_NOT_FOUND, ex.getMessage());
     }
+  }
+
+  @Test
+  void GivenThereIsUsersRegisteredWhenFindAllThenReturnAListOfUsers() {
+    Mockito.when(repository.findAll()).thenReturn(List.of(user));
+
+    var response = service.findAll();
+
+    assertNotNull(response);
+    assertEquals(1, response.size());
+    assertEquals(User.class, response.get(INDEX).getClass());
+
+    assertEquals(ID, response.get(0).getId());
+    assertEquals(NAME, response.get(0).getName());
+    assertEquals(EMAIL, response.get(0).getEmail());
   }
 }
