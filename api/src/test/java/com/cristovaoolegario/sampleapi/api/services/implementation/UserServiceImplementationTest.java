@@ -3,7 +3,10 @@ package com.cristovaoolegario.sampleapi.api.services.implementation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.Optional;
@@ -148,6 +151,28 @@ public class UserServiceImplementationTest {
     } catch (Exception ex) {
       assertEquals(DataIntegrityViolationException.class, ex.getClass());
       assertEquals(EMAIL_ALREADY_REGISTERED, ex.getMessage());
+    }
+  }
+
+  @Test
+  void GivenAValidIdWhenDeleteUserThenDeleteWithSuccess() {
+    Mockito.when(repository.findById(anyInt())).thenReturn(optionalUser);
+    Mockito.doNothing().when(repository).deleteById(anyInt());
+
+    service.Delete(ID);
+
+    verify(repository, times(1)).deleteById(ID);
+  }
+
+  @Test
+  void GivenAnInvalidIdWhenDeleteUserThenReturnAnObjectNotFoundException() {
+    Mockito.when(repository.findById(anyInt())).thenThrow(new ObjectNotFoundException(OBJECT_NOT_FOUND));
+
+    try {
+      service.Delete(ID);
+    } catch (Exception ex) {
+      assertEquals(ObjectNotFoundException.class, ex.getClass());
+      assertEquals(OBJECT_NOT_FOUND, ex.getMessage());
     }
   }
 }
