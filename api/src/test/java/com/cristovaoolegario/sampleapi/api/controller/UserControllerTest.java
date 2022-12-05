@@ -1,6 +1,5 @@
 package com.cristovaoolegario.sampleapi.api.controller;
 
-import org.glassfish.jaxb.core.v2.model.core.ID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -10,6 +9,9 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.cristovaoolegario.sampleapi.api.domain.User;
 import com.cristovaoolegario.sampleapi.api.domain.dto.UserDTO;
@@ -30,7 +32,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.cristovaoolegario.sampleapi.api.utils.UserTestUtils.OBJECT_NOT_FOUND;
-import static com.cristovaoolegario.sampleapi.api.utils.UserTestUtils.EMAIL_ALREADY_REGISTERED;
 import static com.cristovaoolegario.sampleapi.api.utils.UserTestUtils.INDEX;
 
 public class UserControllerTest {
@@ -59,6 +60,9 @@ public class UserControllerTest {
     user = UserTestUtils.NewTestUser();
     dto = UserTestUtils.NewUserDTO();
     optionalUser = UserTestUtils.NewOptionalUser();
+    MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+    ServletRequestAttributes attributes = new ServletRequestAttributes(mockRequest);
+    RequestContextHolder.setRequestAttributes(attributes);
   }
 
   @Test
@@ -109,5 +113,16 @@ public class UserControllerTest {
     assertEquals(ID, response.getBody().get(INDEX).getId());
     assertEquals(NAME, response.getBody().get(INDEX).getName());
     assertEquals(EMAIL, response.getBody().get(INDEX).getEmail());
+  }
+
+  @Test
+  void GivenAValidInputWhenCreateThenReturnCreatedUser() {
+    Mockito.when(service.create(any())).thenReturn(user);
+
+    var response = controller.create(dto);
+
+    assertEquals(ResponseEntity.class, response.getClass());
+    assertNotNull(response.getHeaders().get("Location"));
+    assertEquals(HttpStatus.CREATED, response.getStatusCode());
   }
 }
