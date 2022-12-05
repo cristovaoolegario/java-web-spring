@@ -125,4 +125,22 @@ public class UserControllerTest {
     assertNotNull(response.getHeaders().get("Location"));
     assertEquals(HttpStatus.CREATED, response.getStatusCode());
   }
+
+  @Test
+  void GivenAValidInputWhenUpdateUserThenReturnSucess() {
+    Mockito.when(service.update(dto)).thenReturn(user);
+    Mockito.when(modelMapper.map(any(), any())).thenReturn(dto);
+
+    var response = controller.update(ID, dto);
+
+    assertNotNull(response);
+    assertNotNull(response.getBody());
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(ResponseEntity.class, response.getClass());
+    assertEquals(UserDTO.class, response.getBody().getClass());
+
+    assertEquals(ID, response.getBody().getId());
+    assertEquals(NAME, response.getBody().getName());
+    assertEquals(EMAIL, response.getBody().getEmail());
+  }
 }
