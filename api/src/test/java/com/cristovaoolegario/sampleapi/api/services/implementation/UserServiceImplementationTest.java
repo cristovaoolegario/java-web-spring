@@ -2,6 +2,8 @@ package com.cristovaoolegario.sampleapi.api.services.implementation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.cristovaoolegario.sampleapi.api.domain.User;
 import com.cristovaoolegario.sampleapi.api.domain.dto.UserDTO;
 import com.cristovaoolegario.sampleapi.api.repositories.UserRepository;
+import com.cristovaoolegario.sampleapi.api.services.exceptions.DataIntegrityViolationException;
 import com.cristovaoolegario.sampleapi.api.services.exceptions.ObjectNotFoundException;
 
 @SpringBootTest
@@ -92,5 +95,33 @@ public class UserServiceImplementationTest {
     assertEquals(ID, response.get(0).getId());
     assertEquals(NAME, response.get(0).getName());
     assertEquals(EMAIL, response.get(0).getEmail());
+  }
+
+  @Test
+  void GivenAValidInputWhenCreateUserThenReturnCreatedUser() {
+    Mockito.when(repository.save(any())).thenReturn(user);
+
+    var response = service.create(dto);
+
+    assertNotNull(response);
+    assertEquals(User.class, response.getClass());
+
+    assertEquals(ID, response.getId());
+    assertEquals(NAME, response.getName());
+    assertEquals(EMAIL, response.getEmail());
+  }
+
+  @Test
+  void GivenAnInvalidInputWhenCreateUserThenDataIntegrityViolationException() {
+    Mockito.when(repository.findByEmail(anyString())).thenReturn(optionalUser);
+
+    try {
+      optionalUser.get().setId(2);
+      service.create(dto);
+    } catch (Exception ex) {
+      assertEquals(DataIntegrityViolationException.class, ex.getClass());
+      assertEquals("Email already registered!", ex.getMessage());
+    }
+
   }
 }
