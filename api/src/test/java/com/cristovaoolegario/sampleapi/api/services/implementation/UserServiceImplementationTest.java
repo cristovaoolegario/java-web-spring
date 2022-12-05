@@ -11,7 +11,6 @@ import static org.mockito.Mockito.verify;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -27,16 +26,16 @@ import com.cristovaoolegario.sampleapi.api.repositories.UserRepository;
 import com.cristovaoolegario.sampleapi.api.services.exceptions.DataIntegrityViolationException;
 import com.cristovaoolegario.sampleapi.api.services.exceptions.ObjectNotFoundException;
 
+import com.cristovaoolegario.sampleapi.api.utils.UserTestUtils;
+import static com.cristovaoolegario.sampleapi.api.utils.UserTestUtils.EMAIL;
+import static com.cristovaoolegario.sampleapi.api.utils.UserTestUtils.ID;
+import static com.cristovaoolegario.sampleapi.api.utils.UserTestUtils.NAME;
+import static com.cristovaoolegario.sampleapi.api.utils.UserTestUtils.OBJECT_NOT_FOUND;
+import static com.cristovaoolegario.sampleapi.api.utils.UserTestUtils.EMAIL_ALREADY_REGISTERED;
+import static com.cristovaoolegario.sampleapi.api.utils.UserTestUtils.INDEX;
+
 @SpringBootTest
 public class UserServiceImplementationTest {
-
-  private static final Integer ID = 1;
-  private static final String NAME = "test user";
-  private static final String EMAIL = "test@gmail.com";
-  private static final String PASSWORD = "123password";
-  private static final String OBJECT_NOT_FOUND = "Object not found";
-  private static final String EMAIL_ALREADY_REGISTERED = "Email already registered!";
-  private static final int INDEX = 0;
 
   @InjectMocks
   private UserServiceImplementation service;
@@ -56,10 +55,9 @@ public class UserServiceImplementationTest {
   }
 
   private void fillUsers() {
-    user = new User(ID, NAME, EMAIL, PASSWORD);
-    dto = new UserDTO(ID, NAME, EMAIL, PASSWORD);
-    optionalUser = Optional.of(new User(ID, NAME, EMAIL, PASSWORD));
-
+    user = UserTestUtils.NewTestUser();
+    dto = UserTestUtils.NewUserDTO();
+    optionalUser = UserTestUtils.NewOptionalUser();
   }
 
   @Test
