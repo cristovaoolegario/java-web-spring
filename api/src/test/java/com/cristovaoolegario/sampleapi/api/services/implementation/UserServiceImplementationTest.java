@@ -32,6 +32,7 @@ public class UserServiceImplementationTest {
   private static final String EMAIL = "test@gmail.com";
   private static final String PASSWORD = "123password";
   private static final String OBJECT_NOT_FOUND = "Object not found";
+  private static final String EMAIL_ALREADY_REGISTERED = "Email already registered!";
   private static final int INDEX = 0;
 
   @InjectMocks
@@ -112,7 +113,7 @@ public class UserServiceImplementationTest {
   }
 
   @Test
-  void GivenAnInvalidInputWhenCreateUserThenDataIntegrityViolationException() {
+  void GivenAnInvalidInputWhenCreateUserThenReturnDataIntegrityViolationException() {
     Mockito.when(repository.findByEmail(anyString())).thenReturn(optionalUser);
 
     try {
@@ -120,8 +121,33 @@ public class UserServiceImplementationTest {
       service.create(dto);
     } catch (Exception ex) {
       assertEquals(DataIntegrityViolationException.class, ex.getClass());
-      assertEquals("Email already registered!", ex.getMessage());
+      assertEquals(EMAIL_ALREADY_REGISTERED, ex.getMessage());
     }
+  }
 
+  @Test
+  void GivenAValidInputWhenUpdateUserThenReturnUpdatedUser() {
+    Mockito.when(repository.save(any())).thenReturn(user);
+
+    var response = service.update(dto);
+
+    assertNotNull(response);
+    assertEquals(User.class, response.getClass());
+    assertEquals(ID, response.getId());
+    assertEquals(NAME, response.getName());
+    assertEquals(EMAIL, response.getEmail());
+  }
+
+  @Test
+  void GivenAnInalidInputWhenUpdateUserThenReturnDataIntegrityViolationException() {
+    Mockito.when(repository.findByEmail(anyString())).thenReturn(optionalUser);
+
+    try {
+      optionalUser.get().setId(2);
+      service.update(dto);
+    } catch (Exception ex) {
+      assertEquals(DataIntegrityViolationException.class, ex.getClass());
+      assertEquals(EMAIL_ALREADY_REGISTERED, ex.getMessage());
+    }
   }
 }
