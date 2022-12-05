@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.cristovaoolegario.sampleapi.api.domain.User;
@@ -19,12 +20,13 @@ import com.cristovaoolegario.sampleapi.api.utils.UserTestUtils;
 import static com.cristovaoolegario.sampleapi.api.utils.UserTestUtils.EMAIL;
 import static com.cristovaoolegario.sampleapi.api.utils.UserTestUtils.ID;
 import static com.cristovaoolegario.sampleapi.api.utils.UserTestUtils.NAME;
-import static com.cristovaoolegario.sampleapi.api.utils.UserTestUtils.PASSWORD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.cristovaoolegario.sampleapi.api.utils.UserTestUtils.OBJECT_NOT_FOUND;
@@ -68,9 +70,10 @@ public class UserControllerTest {
 
     assertNotNull(response);
     assertNotNull(response.getBody());
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+
     assertEquals(ResponseEntity.class, response.getClass());
     assertEquals(UserDTO.class, response.getBody().getClass());
-
     assertEquals(ID, response.getBody().getId());
     assertEquals(NAME, response.getBody().getName());
     assertEquals(EMAIL, response.getBody().getEmail());
@@ -86,5 +89,25 @@ public class UserControllerTest {
       assertEquals(ObjectNotFoundException.class, ex.getClass());
       assertEquals(OBJECT_NOT_FOUND, ex.getMessage());
     }
+  }
+
+  @Test
+  void GivenValidInputWhenFindAllThenReturnAListOfUserDTO() {
+
+    Mockito.when(service.findAll()).thenReturn(List.of(user));
+    Mockito.when(modelMapper.map(any(), any())).thenReturn(dto);
+
+    var response = controller.findAll();
+
+    assertNotNull(response);
+    assertNotNull(response.getBody());
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(ResponseEntity.class, response.getClass());
+    assertEquals(ArrayList.class, response.getBody().getClass());
+    assertEquals(UserDTO.class, response.getBody().get(INDEX).getClass());
+
+    assertEquals(ID, response.getBody().get(INDEX).getId());
+    assertEquals(NAME, response.getBody().get(INDEX).getName());
+    assertEquals(EMAIL, response.getBody().get(INDEX).getEmail());
   }
 }
